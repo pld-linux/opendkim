@@ -4,9 +4,9 @@ Version:	2.9.2
 Release:	0.1
 License:	BSD and Sendmail
 Group:		Daemons
-URL:		http://opendkim.org/
 Source0:	http://downloads.sourceforge.net/opendkim/%{name}-%{version}.tar.gz
 # Source0-md5:	08cc80a2aedec62b0444d8d6af24a155
+URL:		http://opendkim.org/
 BuildRequires:	db-devel
 BuildRequires:	libmemcached-devel
 BuildRequires:	openssl-devel
@@ -33,7 +33,7 @@ built using libopendkim.
 %package libs-devel
 Summary:	Development files for libopendkim
 Group:		Development/Libraries
-Requires:	libopendkim = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
 
 %description libs-devel
 This package contains the static libraries, headers, and other support
@@ -50,22 +50,21 @@ files required for developing applications against libopendkim.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 install -d $RPM_BUILD_ROOT%{_initrddir}
 install -d $RPM_BUILD_ROOT%{systemdunitdir}
+install -p contrib/init/redhat/%{name} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 cp -p contrib/systemd/%{name}.service $RPM_BUILD_ROOT%{systemdunitdir}/%{name}.service
-cp -p contrib/init/redhat/%{name} $RPM_BUILD_ROOT%{_initrddir}/%{name}
 cp -p contrib/init/redhat/%{name}-default-keygen $RPM_BUILD_ROOT%{_sbindir}/%{name}-default-keygen
-
-%post libs -p /sbin/ldconfig
-%postun libs -p /sbin/ldconfig
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -101,4 +100,3 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/%{name}
 %{_libdir}/*.so
 %{_pkgconfigdir}/*.pc
-
